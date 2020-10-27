@@ -6,28 +6,27 @@ import "./styles.css";
 function App() {
   const [repositories, setRepositories] = useState([])
 
+  useEffect(() => {
+    api.get('/repositories').then(response => {
+      setRepositories(response.data)
+    })
+  }, [])
+
   async function handleAddRepository() {
     const response = await api.post('/repositories',  {
       id: uuidv4(),
       title: `React`,
       likes: 0
     })
-    setRepositories([...repositories, response])
-    return repositories
-
+    const repository = response.data
+    setRepositories([...repositories, repository])
   }
 
-  useEffect(() => {
-    api.get('/repositories').then(response => {
-      setRepositories(response.data)
-    })
-  }, [repositories])
-
   async function handleRemoveRepository(id) {
-    const repId = repositories.filter((repo) => repo.id !== id)
+    const filterRepositories = repositories.filter(repository => repository.id !== id);
     await api.delete(`/repositories/${id}`)
-    setRepositories([...repositories])
-    return repositories
+
+    setRepositories([...filterRepositories])
   }
 
   return (
